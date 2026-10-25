@@ -70,7 +70,7 @@ nfpms:
 
 release:
   github:
-    owner: aic0d3r
+    owner: "{{ .Env.GITHUB_REPOSITORY_OWNER }}"
     name: z13ctl-plus
   draft: false
   prerelease: auto
