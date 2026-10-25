@@ -443,8 +443,9 @@ KDE/GNOME power-profile UIs for anyone who wants both.
 
 **Daemon logs "button watcher stopped; retrying … permission denied"**
 
-Another process may be holding an exclusive grab on the Armoury Crate button
-device. On gaming distributions, [InputPlumber](https://github.com/ShadowBlip/InputPlumber)
+The daemon cannot open the Armoury Crate button device with its current
+permissions. Another process holding an exclusive grab can instead silently
+prevent button events from reaching the shared watcher. On gaming distributions, [InputPlumber](https://github.com/ShadowBlip/InputPlumber)
 is a common cause. See
 [InputPlumber compatibility](daemon.md#inputplumber-compatibility) for the fix.
 

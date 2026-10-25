@@ -115,8 +115,8 @@ contrib/
 - `--dry-run` is a global persistent flag; each command checks `dryRunFlag` and
   calls the appropriate `cli.DryRun*` function.
 - `--no-button` is a global persistent flag; only affects the daemon subcommand.
-  When set, the button watcher goroutine is not started and EVIOCGRAB is not issued,
-  allowing other tools to exclusively grab the Armoury Crate button device.
+  When set, the button watcher goroutine is not started. The watcher otherwise
+  reads shared events without EVIOCGRAB.
 - **Daemon socket fallback**: CLI commands try the Unix socket first (1 s timeout);
   fall back to direct HID/sysfs if the daemon is not running. Detection is implicit:
   connection refused → fall back. Only the Plus socket is checked; an upstream
@@ -154,12 +154,12 @@ contrib/
   touches external outputs, waits 10 seconds after desktop/dock posture, and skips
   writes while eDP-1 is disabled.
 - **Button watcher**: Finds "Asus WMI hotkeys" input device by sysfs name
-  (`/sys/class/input/*/device/name`), opens it, grabs it exclusively with EVIOCGRAB,
+  (`/sys/class/input/*/device/name`), opens it for shared, non-exclusive reads,
   and listens for KEY_PROG3 (code 202) key-down events. KEY_PROG3 is the Armoury Crate
   button keycode on the 2025 ROG Flow Z13 (differs from older ASUS models that use
   KEY_PROG1). Forwards press events to subscribed GUI connections via long-lived
-  socket connections. Disabled with `--no-button` to allow other tools exclusive
-  access to the button device.
+  socket connections. Never grabs the device, so SW_TABLET_MODE transitions still
+  reach libinput. Disabled with `--no-button`.
 - **Daemon socket protocol**: Newline-delimited JSON over Unix socket. All responses
   are `{"ok":bool,...}`. CLI `--get` commands read sysfs directly (always ground truth).
   GUI/Decky callers use the daemon socket for all operations including GET. Protocol:

@@ -1,0 +1,35 @@
+name: Test RPM
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rpm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Test button watcher on GitHub
+        run: go test -race ./internal/daemon -run 'Test(FindButtonDevice|RunButtonLoop|WatchButton)' -count=1
+      - name: Build snapshot packages
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          version: '~> v2'
+          args: release --snapshot --clean
+      - name: Upload test RPM
+        uses: actions/upload-artifact@v4
+        with:
+          name: z13ctl-plus-test-rpm-${{ github.sha }}
+          path: dist/*.rpm
+          if-no-files-found: error
+          retention-days: 14

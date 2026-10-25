@@ -278,15 +278,20 @@ See the [API](api.md) page for details.
 On gaming distributions such as Bazzite and ChimeraOS, [InputPlumber](https://github.com/ShadowBlip/InputPlumber)
 ships a built-in device profile for the ROG Flow Z13 (`50-rog_flow_z13.yaml`)
 that grabs `"Asus WMI hotkeys"` as a managed source device. This creates an
-exclusive evdev conflict: z13ctl-plus cannot open the device and will log:
+shared-reader conflict: if device permissions prevent opening it, z13ctl-plus logs:
 
 ```
 button watcher stopped; retrying err="open /dev/input/eventN: permission denied"
 ```
 
+An exclusive grab held by another process can also silently starve the shared
+watcher of events, leaving the side button unresponsive. z13ctl-plus itself never
+grabs this node: libinput must receive its `SW_TABLET_MODE` transitions so attaching
+the folio after login re-enables ordinary typing.
+
 **Workaround:** Create an override config that marks `"Asus WMI hotkeys"` as
 `ignore: true`. This tells InputPlumber to leave that device unmanaged so
-z13ctl-plus can grab it exclusively, while preserving all other InputPlumber
+z13ctl-plus can read its events non-exclusively, while preserving all other InputPlumber
 functionality (controller emulation, touchpad, etc.).
 
 First, check whether the built-in config exists on your system:
@@ -318,7 +323,7 @@ matches:
 
 source_devices:
   - group: keyboard
-    ignore: true        # allow z13ctl-plus to grab this device exclusively
+    ignore: true        # allow z13ctl-plus and libinput to receive events
     evdev:
       name: Asus WMI hotkeys
       handler: event*
