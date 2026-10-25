@@ -15,6 +15,11 @@
 
 </div>
 
+**Why this fork?** We forked [aic0d3r/z13ctl-plus](https://github.com/aic0d3r/z13ctl-plus)
+to fix the folio keyboard not accepting ordinary typing when attached after
+booting without it. The fix lets the desktop receive tablet-mode changes while
+preserving the Armoury Crate side button and Z13GUI+ support.
+
 Linux control for the **2025 ASUS ROG Flow Z13** (GZ302): RGB keyboard and
 lightbar lighting, custom fan curves, TDP/PPT power limits, CPU undervolting
 via Curve Optimizer, battery charge limiting, boot sound and panel overdrive,
